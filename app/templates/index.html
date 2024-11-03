@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<div class="workspace">
+    <div class="canvas-container">
+        <div class="canvas-toolbar">
+            <button onclick="handleSave()" class="toolbar-button">
+                <i class="fas fa-save"></i> Save Blueprint
+            </button>
+            <input type="file" id="loadFile" style="display: none" accept=".json" onchange="handleLoad(event)">
+            <button onclick="document.getElementById('loadFile').click()" class="toolbar-button">
+                <i class="fas fa-folder-open"></i> Load Blueprint
+            </button>
+        </div>
+        <svg id="main-canvas"></svg>
+    </div>
+    <div class="sidebar">
+        <div class="chat-container">
+            <div class="chat-messages"></div>
+            <div class="chat-input">
+                <input type="text" id="chat-input" placeholder="Ask BlueprintBuddy...">
+                <button id="send-message">Send</button>
+                <button onclick="window.blueprintCanvas.testCreateComponent()">Test</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Make sure D3 is loaded before canvas.js -->
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="{{ url_for('static', filename='js/canvas.js') }}"></script>
+<!-- Add Font Awesome for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<!-- Add save/load handlers -->
+<script>
+    function handleSave() {
+        window.blueprintCanvas.saveToJson();
+    }
+
+    async function handleLoad(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        
+        try {
+            await window.blueprintCanvas.loadFromJson(file);
+            console.log('Blueprint loaded successfully');
+        } catch (error) {
+            console.error('Error loading blueprint:', error);
+            alert('Error loading blueprint file');
+        }
+        
+        // Reset file input
+        event.target.value = '';
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        console.log('D3 version:', d3.version);
+        console.log('Canvas initialized');
+    });
+</script>
+
+<!-- Add some CSS for the toolbar -->
+<style>
+    .canvas-toolbar {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        z-index: 1000;
+        display: flex;
+        gap: 10px;
+    }
+
+    .toolbar-button {
+        background-color: #37474f;
+        color: #90a4ae;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 4px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: background-color 0.2s;
+    }
+
+    .toolbar-button:hover {
+        background-color: #455a64;
+        color: #b0bec5;
+    }
+
+    .toolbar-button:active {
+        background-color: #546e7a;
+    }
+
+    .toolbar-button i {
+        font-size: 14px;
+    }
+</style>
+{% endblock %}
