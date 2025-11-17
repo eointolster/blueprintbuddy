@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BlueprintBuddy Module Test</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background-color: #1a237e;
+            color: #90caf9;
+            margin: 0;
+            padding: 20px;
+        }
+        #main-canvas {
+            width: 100%;
+            height: 600px;
+            background: #1a237e;
+            border: 1px solid #29b6f6;
+        }
+        .test-results {
+            margin-top: 20px;
+            padding: 10px;
+            background: #263238;
+            border-radius: 4px;
+        }
+        .test-pass { color: #4caf50; }
+        .test-fail { color: #f44336; }
+        .toolbar {
+            margin-bottom: 10px;
+        }
+        button {
+            background: #29b6f6;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            margin-right: 8px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        button:hover {
+            background: #42a5f5;
+        }
+    </style>
+</head>
+<body>
+    <h1>BlueprintBuddy Module Test</h1>
+
+    <div class="toolbar">
+        <button onclick="runTests()">Run Tests</button>
+        <button onclick="testCreateComponent()">Create Component</button>
+        <button onclick="testSave()">Test Save</button>
+        <button onclick="clearCanvas()">Clear Canvas</button>
+    </div>
+
+    <svg id="main-canvas"></svg>
+
+    <div class="test-results" id="test-results">
+        <h3>Test Results:</h3>
+        <div id="results"></div>
+    </div>
+
+    <!-- Load D3 -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+
+    <!-- Load modular canvas components in order -->
+    <script src="app/static/js/modules/StateManager.js"></script>
+    <script src="app/static/js/modules/PortManager.js"></script>
+    <script src="app/static/js/modules/ComponentManager.js"></script>
+    <script src="app/static/js/modules/ConnectionManager.js"></script>
+    <script src="app/static/js/modules/UIManager.js"></script>
+    <script src="app/static/js/modules/CanvasCore.js"></script>
+
+    <script>
+        let blueprintCanvas;
+
+        function log(message, isError = false) {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = isError ? 'test-fail' : 'test-pass';
+            div.textContent = (isError ? '✗ ' : '✓ ') + message;
+            results.appendChild(div);
+        }
+
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+        }
+
+        function runTests() {
+            clearResults();
+
+            try {
+                // Test 1: Check all classes are defined
+                log('StateManager class defined: ' + (typeof StateManager !== 'undefined'));
+                log('PortManager class defined: ' + (typeof PortManager !== 'undefined'));
+                log('ComponentManager class defined: ' + (typeof ComponentManager !== 'undefined'));
+                log('ConnectionManager class defined: ' + (typeof ConnectionManager !== 'undefined'));
+                log('UIManager class defined: ' + (typeof UIManager !== 'undefined'));
+                log('BlueprintCanvas class defined: ' + (typeof BlueprintCanvas !== 'undefined'));
+
+                // Test 2: Initialize canvas
+                blueprintCanvas = new BlueprintCanvas();
+                log('BlueprintCanvas initialized successfully');
+
+                // Test 3: Check managers exist
+                log('StateManager instance exists: ' + (blueprintCanvas.stateManager !== undefined));
+                log('PortManager instance exists: ' + (blueprintCanvas.portManager !== undefined));
+                log('ComponentManager instance exists: ' + (blueprintCanvas.componentManager !== undefined));
+                log('ConnectionManager instance exists: ' + (blueprintCanvas.connectionManager !== undefined));
+                log('UIManager instance exists: ' + (blueprintCanvas.uiManager !== undefined));
+
+                // Test 4: Test component creation
+                const comp = blueprintCanvas.createComponent(100, 100, 'function');
+                log('Component created: ' + (comp !== null && comp !== undefined));
+                log('Component has ID: ' + (comp && comp.id !== undefined));
+                log('Component rendered on canvas: ' + (blueprintCanvas.components.length > 0));
+
+                // Test 5: Test state management
+                const stateBefore = blueprintCanvas.components.length;
+                const comp2 = blueprintCanvas.createComponent(300, 100, 'class');
+                const stateAfter = blueprintCanvas.components.length;
+                log('State tracking works: ' + (stateAfter === stateBefore + 1));
+
+                // Test 6: Test undo/redo
+                const historyInfo = blueprintCanvas.stateManager.getHistoryInfo();
+                log('Undo history available: ' + historyInfo.canUndo);
+
+                // Test 7: Test component types
+                const types = BlueprintCanvas.COMPONENT_TYPES;
+                log('COMPONENT_TYPES available: ' + (types !== undefined));
+                log('Function type defined: ' + (types.FUNCTION !== undefined));
+                log('Class type defined: ' + (types.CLASS !== undefined));
+                log('Module type defined: ' + (types.MODULE !== undefined));
+
+                // Test 8: Test selection
+                blueprintCanvas.uiManager.selectComponent(comp.id);
+                const selected = blueprintCanvas.uiManager.getSelectedComponents();
+                log('Component selection works: ' + (selected.length === 1));
+
+                log('=== All tests passed! ===', false);
+
+            } catch (error) {
+                log('ERROR: ' + error.message, true);
+                console.error('Test error:', error);
+            }
+        }
+
+        function testCreateComponent() {
+            if (!blueprintCanvas) {
+                blueprintCanvas = new BlueprintCanvas();
+            }
+            const x = Math.random() * 600 + 50;
+            const y = Math.random() * 400 + 50;
+            const types = ['function', 'class', 'module'];
+            const type = types[Math.floor(Math.random() * types.length)];
+
+            blueprintCanvas.createComponent(x, y, type);
+            log(`Created ${type} component at (${Math.round(x)}, ${Math.round(y)})`);
+        }
+
+        function testSave() {
+            if (!blueprintCanvas) {
+                log('Create some components first', true);
+                return;
+            }
+
+            const json = blueprintCanvas.stateManager.exportToJson(
+                blueprintCanvas.components,
+                blueprintCanvas.connections
+            );
+            log('JSON export successful');
+            console.log('Exported JSON:', JSON.parse(json));
+        }
+
+        function clearCanvas() {
+            if (blueprintCanvas) {
+                blueprintCanvas.components = [];
+                blueprintCanvas.connections = [];
+                blueprintCanvas.mainGroup.selectAll('*').remove();
+                blueprintCanvas.connectionLayer.selectAll('*').remove();
+                log('Canvas cleared');
+            }
+        }
+
+        // Auto-run tests on load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                log('D3.js version: ' + d3.version);
+                log('Page loaded, ready for testing');
+            }, 100);
+        });
+    </script>
+</body>
+</html>

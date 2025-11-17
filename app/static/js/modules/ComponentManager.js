@@ -213,13 +213,13 @@ class ComponentManager {
             // Port interactions for connections
             portCircle.on('mousedown', (event) => {
                 event.stopPropagation();
-                if (this.onConnectionStart && this.onConnectionFinish) {
-                    if (isInput && this.isCreatingConnection) {
-                        this.onConnectionFinish(portGroup);
-                    } else if (!isInput && !this.isCreatingConnection) {
-                        this.onConnectionStart(portGroup);
-                        this.isCreatingConnection = true;
-                    }
+                // For output ports, start connection
+                if (!isInput && this.onConnectionStart) {
+                    this.onConnectionStart(portGroup);
+                }
+                // For input ports, finish connection
+                else if (isInput && this.onConnectionFinish) {
+                    this.onConnectionFinish(portGroup);
                 }
             });
 
