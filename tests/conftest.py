@@ -91,8 +91,8 @@ def sample_blueprint():
         ],
         'connections': [
             {
-                'from': {'componentId': 'comp1', 'portId': 'out1'},
-                'to': {'componentId': 'comp2', 'portId': 'in2'}
+                'from': 'comp1-out1',
+                'to': 'comp2-in2'
             }
         ],
         'metadata': {

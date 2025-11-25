@@ -55,22 +55,35 @@
         if (!file) return;
 
         try {
+            // Validate file type
+            if (!file.name.endsWith('.json')) {
+                throw new Error('Invalid file type. Please select a JSON file.');
+            }
+
+            // Validate file size (max 10MB)
+            const maxSize = 10 * 1024 * 1024;
+            if (file.size > maxSize) {
+                throw new Error('File too large. Maximum size is 10MB.');
+            }
+
+            // Validate file is not empty
+            if (file.size === 0) {
+                throw new Error('File is empty.');
+            }
+
             await window.blueprintCanvas.loadFromJson(file);
-            console.log('Blueprint loaded successfully');
         } catch (error) {
             console.error('Error loading blueprint:', error);
-            alert('Error loading blueprint file');
+            alert(`Error loading blueprint: ${error.message}`);
+        } finally {
+            // Reset file input in finally block to ensure cleanup
+            event.target.value = '';
         }
-
-        // Reset file input
-        event.target.value = '';
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-        console.log('D3 version:', d3.version);
         // Initialize canvas
         window.blueprintCanvas = new BlueprintCanvas();
-        console.log('Canvas initialized with modular architecture');
     });
 </script>
 

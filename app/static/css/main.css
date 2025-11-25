@@ -111,15 +111,6 @@ nav {
     user-select: none;
 }
 
-#main-canvas {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: var(--blueprint-bg);
-}
-
 .port circle {
     cursor: pointer;
     transition: fill 0.2s;
@@ -127,6 +118,7 @@ nav {
 
 .port circle:hover {
     fill: #64b5f6;
+    cursor: pointer;
 }
 
 .port.inputs circle {
@@ -138,35 +130,19 @@ nav {
 }
 
 .connection {
-    pointer-events: none;
+    pointer-events: all;
+    cursor: pointer;
     opacity: 0.8;
 }
 
 .connection:hover {
     stroke-width: 3;
+    stroke: #ff4081;
     opacity: 1;
-}
-
-.port circle:hover {
-    fill: #64b5f6;
-    cursor: pointer;
 }
 
 .connection.temp {
     pointer-events: none;
-}
-
-.port.outputs circle {
-    cursor: crosshair;
-}
-
-.port.inputs circle {
-    cursor: pointer;
-}
-
-.connection:hover {
-    stroke-width: 3;
-    stroke: #ff4081;
 }
 
 .type-selector rect {
@@ -200,28 +176,6 @@ foreignObject input {
     font-family: 'Courier New', monospace;
     font-size: 14px;
     outline: none;
-}
-
-.connection {
-    pointer-events: all;
-    cursor: pointer;
-}
-
-.connection:hover {
-    stroke-width: 3;
-    stroke: #ff4081;
-}
-
-.type-selector rect {
-    cursor: pointer;
-}
-
-.type-menu {
-    cursor: pointer;
-}
-
-.type-menu rect:hover {
-    opacity: 0.8;
 }
 
 .blueprint-context-menu {
