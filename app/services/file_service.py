@@ -313,23 +313,97 @@ class FileService:
         try:
             # Check required fields
             if not isinstance(blueprint_data, dict):
+                current_app.logger.warning("Blueprint data is not a dictionary")
                 return False
 
             # Must have components and connections
             if 'components' not in blueprint_data or 'connections' not in blueprint_data:
+                current_app.logger.warning("Blueprint missing 'components' or 'connections'")
                 return False
 
             # Components must be a list
             if not isinstance(blueprint_data['components'], list):
+                current_app.logger.warning("Components is not a list")
                 return False
 
             # Connections must be a list
             if not isinstance(blueprint_data['connections'], list):
+                current_app.logger.warning("Connections is not a list")
                 return False
 
+            # Limit number of components and connections (prevent DoS)
+            max_components = 10000
+            max_connections = 50000
+            if len(blueprint_data['components']) > max_components:
+                current_app.logger.warning(f"Too many components: {len(blueprint_data['components'])}")
+                return False
+            if len(blueprint_data['connections']) > max_connections:
+                current_app.logger.warning(f"Too many connections: {len(blueprint_data['connections'])}")
+                return False
+
+            # Track valid component IDs
+            component_ids = set()
+
             # Validate each component has required fields
-            for component in blueprint_data['components']:
-                if not all(key in component for key in ['id', 'type', 'name']):
+            for idx, component in enumerate(blueprint_data['components']):
+                if not isinstance(component, dict):
+                    current_app.logger.warning(f"Component {idx} is not a dictionary")
+                    return False
+
+                # Check required fields
+                required_fields = ['id', 'type', 'name']
+                if not all(key in component for key in required_fields):
+                    current_app.logger.warning(f"Component {idx} missing required fields")
+                    return False
+
+                # Validate component type
+                valid_types = ['function', 'class', 'module']
+                if component['type'] not in valid_types:
+                    current_app.logger.warning(f"Component {idx} has invalid type: {component['type']}")
+                    return False
+
+                # Check for duplicate IDs
+                if component['id'] in component_ids:
+                    current_app.logger.warning(f"Duplicate component ID: {component['id']}")
+                    return False
+                component_ids.add(component['id'])
+
+                # Validate positions if present
+                if 'x' in component and not isinstance(component['x'], (int, float)):
+                    current_app.logger.warning(f"Component {idx} has invalid x coordinate")
+                    return False
+                if 'y' in component and not isinstance(component['y'], (int, float)):
+                    current_app.logger.warning(f"Component {idx} has invalid y coordinate")
+                    return False
+
+            # Validate connections reference valid components
+            for idx, connection in enumerate(blueprint_data['connections']):
+                if not isinstance(connection, dict):
+                    current_app.logger.warning(f"Connection {idx} is not a dictionary")
+                    return False
+
+                # Check required fields
+                if 'from' not in connection or 'to' not in connection:
+                    current_app.logger.warning(f"Connection {idx} missing 'from' or 'to'")
+                    return False
+
+                # Extract component IDs from connection format "componentId-portId"
+                from_parts = str(connection['from']).split('-', 1)
+                to_parts = str(connection['to']).split('-', 1)
+
+                if len(from_parts) < 2 or len(to_parts) < 2:
+                    current_app.logger.warning(f"Connection {idx} has invalid format")
+                    return False
+
+                from_component_id = from_parts[0]
+                to_component_id = to_parts[0]
+
+                # Check that referenced components exist
+                if from_component_id not in component_ids:
+                    current_app.logger.warning(f"Connection {idx} references invalid component: {from_component_id}")
+                    return False
+                if to_component_id not in component_ids:
+                    current_app.logger.warning(f"Connection {idx} references invalid component: {to_component_id}")
                     return False
 
             return True

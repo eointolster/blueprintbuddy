@@ -63,8 +63,6 @@ class BlueprintCanvas {
 
         // Setup connection drawing
         this.setupConnectionDrawing();
-
-        console.log('BlueprintCanvas initialized');
     }
 
     /**
@@ -178,45 +176,89 @@ class BlueprintCanvas {
     setupDragBehavior() {
         this.drag = d3.drag()
             .on('start', (event) => {
-                const g = d3.select(event.sourceEvent.target.closest('.component'));
-                const componentId = g.attr('id');
+                try {
+                    const componentElement = event.sourceEvent.target.closest('.component');
+                    if (!componentElement) {
+                        console.warn('Drag started on non-component element');
+                        return;
+                    }
 
-                if (!this.uiManager.selectedComponents.has(componentId)) {
-                    this.uiManager.clearSelection();
-                    this.uiManager.selectComponent(componentId);
+                    const g = d3.select(componentElement);
+                    const componentId = g.attr('id');
+
+                    if (!componentId) {
+                        console.warn('Component element missing ID attribute');
+                        return;
+                    }
+
+                    if (!this.uiManager.selectedComponents.has(componentId)) {
+                        this.uiManager.clearSelection();
+                        this.uiManager.selectComponent(componentId);
+                    }
+                } catch (error) {
+                    console.error('Error in drag start:', error);
                 }
             })
             .on('drag', (event) => {
-                this.uiManager.selectedComponents.forEach(componentId => {
-                    const g = d3.select(`#${componentId}`);
-                    const transform = g.attr('transform');
-                    let x = 0, y = 0;
+                try {
+                    if (!event.dx || !event.dy) return;
 
-                    if (transform) {
-                        const parts = transform.match(/translate\(([^,]+),([^)]+)\)/);
-                        if (parts) {
-                            x = parseFloat(parts[1]);
-                            y = parseFloat(parts[2]);
+                    this.uiManager.selectedComponents.forEach(componentId => {
+                        try {
+                            const g = d3.select(`#${componentId}`);
+                            if (g.empty()) {
+                                console.warn(`Component not found: ${componentId}`);
+                                return;
+                            }
+
+                            const transform = g.attr('transform');
+                            let x = 0, y = 0;
+
+                            if (transform) {
+                                const parts = transform.match(/translate\(([^,]+),([^)]+)\)/);
+                                if (parts && parts.length >= 3) {
+                                    const parsedX = parseFloat(parts[1]);
+                                    const parsedY = parseFloat(parts[2]);
+                                    if (!isNaN(parsedX) && !isNaN(parsedY)) {
+                                        x = parsedX;
+                                        y = parsedY;
+                                    }
+                                }
+                            }
+
+                            const newX = x + event.dx;
+                            const newY = y + event.dy;
+
+                            // Validate new positions are finite numbers
+                            if (!isFinite(newX) || !isFinite(newY)) {
+                                console.warn(`Invalid position calculated: (${newX}, ${newY})`);
+                                return;
+                            }
+
+                            g.attr('transform', `translate(${newX},${newY})`);
+
+                            // Update component data
+                            const component = this.components.find(c => c.id === componentId);
+                            if (component) {
+                                component.x = newX;
+                                component.y = newY;
+                            }
+
+                            this.updateConnectionsForComponent(componentId);
+                        } catch (error) {
+                            console.error(`Error dragging component ${componentId}:`, error);
                         }
-                    }
-
-                    const newX = x + event.dx;
-                    const newY = y + event.dy;
-
-                    g.attr('transform', `translate(${newX},${newY})`);
-
-                    // Update component data
-                    const component = this.components.find(c => c.id === componentId);
-                    if (component) {
-                        component.x = newX;
-                        component.y = newY;
-                    }
-
-                    this.updateConnectionsForComponent(componentId);
-                });
+                    });
+                } catch (error) {
+                    console.error('Error in drag event:', error);
+                }
             })
             .on('end', () => {
-                this.stateManager.saveState(this.components, this.connections);
+                try {
+                    this.stateManager.saveState(this.components, this.connections);
+                } catch (error) {
+                    console.error('Error saving state after drag:', error);
+                }
             });
     }
 
@@ -390,7 +432,7 @@ class BlueprintCanvas {
         if (!component) return;
 
         const newComponent = JSON.parse(JSON.stringify(component));
-        newComponent.id = `component-${this.componentManager.componentIdCounter++}`;
+        newComponent.id = this.componentManager.getNextComponentId();
         newComponent.x += 50;
         newComponent.y += 50;
 
@@ -423,7 +465,7 @@ class BlueprintCanvas {
 
         clipboard.forEach(component => {
             const newComponent = JSON.parse(JSON.stringify(component));
-            newComponent.id = `component-${this.componentManager.componentIdCounter++}`;
+            newComponent.id = this.componentManager.getNextComponentId();
             newComponent.x += offset;
             newComponent.y += offset;
 
@@ -531,9 +573,8 @@ class BlueprintCanvas {
      * Test method for creating a component
      */
     testCreateComponent() {
-        console.log('Testing component creation');
         const component = this.createComponent(100, 100, 'function');
-        console.log('Test component created:', component);
+        return component;
     }
 
     /**

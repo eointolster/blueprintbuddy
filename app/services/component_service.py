@@ -249,18 +249,39 @@ class ComponentService:
             Dict containing validation result
         """
         try:
-            from_info = connection.get('from', {})
-            to_info = connection.get('to', {})
+            # Parse connection format: "componentId-portId"
+            from_str = connection.get('from', '')
+            to_str = connection.get('to', '')
 
-            # Find source and target components
-            source_component = next(
-                (c for c in components if c['id'] == from_info.get('componentId')),
-                None
-            )
-            target_component = next(
-                (c for c in components if c['id'] == to_info.get('componentId')),
-                None
-            )
+            if not from_str or not to_str:
+                return {
+                    'valid': False,
+                    'error': 'Invalid connection format'
+                }
+
+            # Extract component and port IDs
+            # Format is either "componentId-portId" or could have multiple hyphens
+            # We need to find the component ID first, then the rest is the port ID
+            from_parts = from_str.split('-')
+            to_parts = to_str.split('-')
+
+            # Find source component by trying to match the beginning of the string
+            source_component = None
+            source_port_id = None
+            for c in components:
+                if from_str.startswith(c['id'] + '-'):
+                    source_component = c
+                    source_port_id = from_str[len(c['id']) + 1:]  # +1 for the hyphen
+                    break
+
+            # Find target component
+            target_component = None
+            target_port_id = None
+            for c in components:
+                if to_str.startswith(c['id'] + '-'):
+                    target_component = c
+                    target_port_id = to_str[len(c['id']) + 1:]  # +1 for the hyphen
+                    break
 
             if not source_component:
                 return {
@@ -277,12 +298,12 @@ class ComponentService:
             # Find source and target ports
             source_port = next(
                 (p for p in source_component.get('outputs', [])
-                 if p['id'] == from_info.get('portId')),
+                 if p['id'] == source_port_id),
                 None
             )
             target_port = next(
                 (p for p in target_component.get('inputs', [])
-                 if p['id'] == to_info.get('portId')),
+                 if p['id'] == target_port_id),
                 None
             )
 
