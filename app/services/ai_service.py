@@ -8,6 +8,9 @@ from flask import current_app
 import json
 from typing import Dict, List, Optional, Any
 
+# Anthropic model configuration
+ANTHROPIC_MODEL = "claude-3-5-sonnet-20241022"
+
 
 class AIService:
     """Service for AI-powered diagram analysis and assistance"""
@@ -21,11 +24,17 @@ class AIService:
         try:
             api_key = current_app.config.get('ANTHROPIC_API_KEY')
             if not api_key:
-                current_app.logger.warning("ANTHROPIC_API_KEY not configured")
+                current_app.logger.error(
+                    "ANTHROPIC_API_KEY not configured! AI features will not work. "
+                    "Please set ANTHROPIC_API_KEY in your .env file."
+                )
+                self.client = None
                 return
             self.client = anthropic.Anthropic(api_key=api_key)
+            current_app.logger.info("Anthropic AI client initialized successfully")
         except Exception as e:
             current_app.logger.error(f"Failed to initialize Anthropic client: {e}")
+            self.client = None
 
     def chat(self, message: str, context: Optional[Dict] = None) -> Dict[str, Any]:
         """
@@ -50,7 +59,7 @@ class AIService:
 
             # Call Claude API
             response = self.client.messages.create(
-                model="claude-3-5-sonnet-20241022",
+                model=ANTHROPIC_MODEL,
                 max_tokens=2048,
                 system=system_prompt,
                 messages=[
@@ -116,7 +125,7 @@ class AIService:
             """
 
             response = self.client.messages.create(
-                model="claude-3-5-sonnet-20241022",
+                model=ANTHROPIC_MODEL,
                 max_tokens=2048,
                 messages=[
                     {"role": "user", "content": prompt}
@@ -164,7 +173,7 @@ class AIService:
             """
 
             response = self.client.messages.create(
-                model="claude-3-5-sonnet-20241022",
+                model=ANTHROPIC_MODEL,
                 max_tokens=1024,
                 messages=[
                     {"role": "user", "content": prompt}
@@ -227,7 +236,7 @@ class AIService:
             """
 
             response = self.client.messages.create(
-                model="claude-3-5-sonnet-20241022",
+                model=ANTHROPIC_MODEL,
                 max_tokens=2048,
                 messages=[
                     {"role": "user", "content": prompt}

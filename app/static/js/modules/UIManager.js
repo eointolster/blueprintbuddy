@@ -18,6 +18,12 @@ class UIManager {
         this.onContextMenuAction = null;
         this.onSelectionChange = null;
         this.onKeyboardAction = null;
+
+        // Store event handlers for cleanup
+        this.eventHandlers = {
+            documentClick: null,
+            keydown: null
+        };
     }
 
     /**
@@ -30,9 +36,10 @@ class UIManager {
             .style('display', 'none');
 
         // Hide context menu on click elsewhere
-        document.addEventListener('click', () => {
+        this.eventHandlers.documentClick = () => {
             this.hideContextMenu();
-        });
+        };
+        document.addEventListener('click', this.eventHandlers.documentClick);
 
         // Right-click handler
         this.svg.on('contextmenu', (event) => {
@@ -107,7 +114,7 @@ class UIManager {
      * Set up keyboard shortcuts
      */
     setupKeyboardShortcuts() {
-        document.addEventListener('keydown', (event) => {
+        this.eventHandlers.keydown = (event) => {
             if (event.ctrlKey || event.metaKey) {
                 let action = null;
                 let preventDefault = false;
@@ -155,7 +162,8 @@ class UIManager {
             } else if (event.key === 'Escape') {
                 this.clearSelection();
             }
-        });
+        };
+        document.addEventListener('keydown', this.eventHandlers.keydown);
     }
 
     /**
@@ -395,8 +403,45 @@ class UIManager {
      * Clean up
      */
     destroy() {
+        // Remove context menu
         if (this.contextMenu) {
             this.contextMenu.remove();
+            this.contextMenu = null;
         }
+
+        // Remove document event listeners
+        if (this.eventHandlers.documentClick) {
+            document.removeEventListener('click', this.eventHandlers.documentClick);
+            this.eventHandlers.documentClick = null;
+        }
+        if (this.eventHandlers.keydown) {
+            document.removeEventListener('keydown', this.eventHandlers.keydown);
+            this.eventHandlers.keydown = null;
+        }
+
+        // Remove SVG event listeners
+        if (this.svg) {
+            this.svg.on('contextmenu', null);
+            this.svg.on('mousedown', null);
+            this.svg.on('mousemove', null);
+            this.svg.on('mouseup', null);
+        }
+
+        // Remove zoom behavior
+        if (this.zoom && this.svg) {
+            this.svg.on('.zoom', null);
+        }
+
+        // Clear selection rect if exists
+        if (this.selectionRect) {
+            this.selectionRect.remove();
+            this.selectionRect = null;
+        }
+
+        // Clear references
+        this.selectedComponents.clear();
+        this.onContextMenuAction = null;
+        this.onSelectionChange = null;
+        this.onKeyboardAction = null;
     }
 }

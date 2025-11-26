@@ -45,6 +45,14 @@ class ComponentManager {
     }
 
     /**
+     * Generate the next unique component ID
+     * Encapsulates the ID counter to prevent external modification
+     */
+    getNextComponentId() {
+        return `component-${this.componentIdCounter++}`;
+    }
+
+    /**
      * Create a new component
      */
     createComponent(x, y, type = 'function') {
@@ -55,7 +63,7 @@ class ComponentManager {
         }
 
         const component = {
-            id: `component-${this.componentIdCounter++}`,
+            id: this.getNextComponentId(),
             x: x,
             y: y,
             width: 200,
