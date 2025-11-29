@@ -219,17 +219,27 @@ class ComponentManager {
                 .style('font-style', 'italic');
 
             // Port interactions for connections
-            portCircle.on('mousedown', (event) => {
-                event.stopPropagation();
-                // For output ports, start connection
-                if (!isInput && this.onConnectionStart) {
-                    this.onConnectionStart(portGroup);
-                }
-                // For input ports, finish connection
-                else if (isInput && this.onConnectionFinish) {
-                    this.onConnectionFinish(portGroup);
-                }
-            });
+            portCircle
+                .on('mousedown', (event) => {
+                    event.stopPropagation();
+                    if (!isInput && this.onConnectionStart) {
+                        this.onConnectionStart(portGroup);
+                    }
+                    if (isInput && this.onConnectionFinish && this.onConnectionFinish.debounce) {
+                        // Some browsers fire mousedown before mouseup on drop targets; defer to mouseup handler
+                        return;
+                    }
+                    if (isInput && this.onConnectionFinish) {
+                        this.onConnectionFinish(portGroup);
+                    }
+                })
+                .on('mouseup', (event) => {
+                    // Allow drag-from-output, drop-on-input flow
+                    if (isInput && this.onConnectionFinish) {
+                        event.stopPropagation();
+                        this.onConnectionFinish(portGroup);
+                    }
+                });
 
             // Port label double-click for deletion
             portLabel.on('dblclick', (event) => {

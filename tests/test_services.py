@@ -5,6 +5,7 @@ Tests for service modules
 import pytest
 from app.services.component_service import ComponentService
 from app.services.file_service import FileService
+from app.services.code_map_service import CodeMapService
 
 
 class TestComponentService:
@@ -153,3 +154,79 @@ class TestFileService:
             assert service._validate_blueprint(sample_blueprint) is True
             assert service._validate_blueprint({}) is False
             assert service._validate_blueprint({'components': []}) is False
+
+
+class TestCodeMapService:
+    """Tests for CodeMapService"""
+
+    def test_maps_simple_codebase(self, app, tmp_path):
+        with app.app_context():
+            # Create a tiny codebase
+            file_a = tmp_path / "module_a.py"
+            file_b = tmp_path / "module_b.py"
+            file_a.write_text(
+                "def alpha():\n"
+                "    beta()\n"
+            )
+            file_b.write_text(
+                "def beta():\n"
+                "    return 42\n"
+            )
+
+            app.config['CODEBASE_ROOT'] = str(tmp_path)
+            app.config['CODEMAP_MAX_FILES'] = 10
+
+            service = CodeMapService()
+            service.initialize()
+            result = service.map_codebase(".")
+
+            assert result["success"] is True
+            blueprint = result["blueprint"]
+            assert len(blueprint["components"]) == 2
+            # Should create a connection alpha -> beta
+            assert any(
+                conn["from"].endswith("-alpha-out") and conn["to"].endswith("-beta-in")
+                for conn in blueprint["connections"]
+            )
+
+    def test_maps_single_file(self, app, tmp_path):
+        with app.app_context():
+            file_a = tmp_path / "single.py"
+            file_a.write_text(
+                "def foo():\n"
+                "    bar()\n"
+                "\n"
+                "def bar():\n"
+                "    return 1\n"
+            )
+
+            app.config['CODEBASE_ROOT'] = str(tmp_path)
+
+            service = CodeMapService()
+            service.initialize()
+            result = service.map_file("single.py")
+
+            assert result["success"] is True
+            bp = result["blueprint"]
+            assert len(bp["components"]) == 2
+            # Intra-file link foo -> bar
+            assert any(conn["to"].endswith("-bar-in") for conn in bp["connections"])
+
+    def test_sanitizes_ids(self, app, tmp_path):
+        with app.app_context():
+            file_a = tmp_path / "pkg.mod.py"
+            file_a.write_text("def a_func():\n    return 1\n")
+            app.config['CODEBASE_ROOT'] = str(tmp_path)
+
+            service = CodeMapService()
+            service.initialize()
+            result = service.map_file("pkg.mod.py")
+
+            assert result["success"] is True
+            bp = result["blueprint"]
+            # IDs should not contain dots
+            for comp in bp["components"]:
+                assert "." not in comp["id"]
+            for conn in bp["connections"]:
+                assert "." not in conn["from"]
+                assert "." not in conn["to"]

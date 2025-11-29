@@ -388,8 +388,8 @@ class FileService:
                     return False
 
                 # Extract component IDs from connection format "componentId-portId"
-                from_parts = str(connection['from']).split('-', 1)
-                to_parts = str(connection['to']).split('-', 1)
+                from_parts = str(connection['from']).rsplit('-', 1)
+                to_parts = str(connection['to']).rsplit('-', 1)
 
                 if len(from_parts) < 2 or len(to_parts) < 2:
                     current_app.logger.warning(f"Connection {idx} has invalid format")

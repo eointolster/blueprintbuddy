@@ -30,6 +30,11 @@ class Config:
     UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'uploads')
     ALLOWED_EXTENSIONS = {'json', 'svg', 'png'}
 
+    # Code mapping
+    CODEBASE_ROOT = os.environ.get('CODEBASE_ROOT', os.getcwd())
+    CODEMAP_MAX_FILES = int(os.environ.get('CODEMAP_MAX_FILES', 200))
+    CODEMAP_EXCLUDE_DIRS = os.environ.get('CODEMAP_EXCLUDE_DIRS', 'venv,.venv,__pycache__,.git,node_modules').split(',')
+
 class DevelopmentConfig(Config):
     DEBUG = True
     TESTING = False

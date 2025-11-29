@@ -13,6 +13,16 @@
             <button onclick="document.getElementById('loadFile').click()" class="toolbar-button">
                 <i class="fas fa-folder-open"></i> Load Blueprint
             </button>
+            <button onclick="handleImportCodebase()" class="toolbar-button">
+                <i class="fas fa-code-branch"></i> Import Codebase
+            </button>
+            <button onclick="handleImportFile()" class="toolbar-button">
+                <i class="fas fa-file-code"></i> Import File
+            </button>
+            <button onclick="handleAutoLayout()" class="toolbar-button">
+                <i class="fas fa-project-diagram"></i> Auto Layout
+            </button>
+            <span id="blueprint-info" class="blueprint-info"></span>
         </div>
         <svg id="main-canvas"></svg>
     </div>
@@ -39,6 +49,7 @@
 <script src="{{ url_for('static', filename='js/modules/ComponentManager.js') }}"></script>
 <script src="{{ url_for('static', filename='js/modules/ConnectionManager.js') }}"></script>
 <script src="{{ url_for('static', filename='js/modules/UIManager.js') }}"></script>
+<script src="{{ url_for('static', filename='js/modules/ChatManager.js') }}"></script>
 <script src="{{ url_for('static', filename='js/modules/CanvasCore.js') }}"></script>
 
 <!-- Add Font Awesome for icons -->
@@ -81,10 +92,91 @@
         }
     }
 
+    async function handleImportCodebase() {
+        const path = prompt('Enter code path to scan (relative to project root):', 'app');
+        if (!path) return;
+
+        try {
+            const response = await fetch('/api/code/map', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ path })
+            });
+
+            const payload = await response.json();
+            if (!response.ok || !payload.success) {
+                throw new Error(payload.error || 'Failed to import codebase');
+            }
+
+            if (payload.blueprint) {
+                window.blueprintCanvas.loadBlueprint(payload.blueprint);
+            }
+
+            const stats = payload.stats || {};
+            const summary = `Imported ${stats.functions || 0} functions across ${stats.files_scanned || 0} files`;
+            console.info(summary);
+            alert(summary);
+            setBlueprintInfo(`Codebase: ${path}`);
+        } catch (error) {
+            console.error('Error importing codebase:', error);
+            alert(`Error importing codebase: ${error.message}`);
+        }
+    }
+
+    function handleAutoLayout() {
+        if (window.blueprintCanvas) {
+            window.blueprintCanvas.autoLayout();
+        }
+    }
+
+    async function handleImportFile() {
+        const path = prompt('Enter Python file path (relative to project root):', 'app/websocket.py');
+        if (!path) return;
+
+        try {
+            const response = await fetch('/api/code/map-file', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ path })
+            });
+
+            const payload = await response.json();
+            if (!response.ok || !payload.success) {
+                throw new Error(payload.error || 'Failed to import file');
+            }
+
+            if (payload.blueprint) {
+                window.blueprintCanvas.loadBlueprint(payload.blueprint);
+            }
+
+            const stats = payload.stats || {};
+            const summary = `Imported ${stats.functions || 0} functions from ${path}`;
+            console.info(summary);
+            alert(summary);
+            setBlueprintInfo(`File: ${path}`);
+        } catch (error) {
+            console.error('Error importing file:', error);
+            alert(`Error importing file: ${error.message}`);
+        }
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
         // Initialize canvas
         window.blueprintCanvas = new BlueprintCanvas();
+        // Initialize chat
+        window.chatManager = new ChatManager();
     });
+
+    function setBlueprintInfo(text) {
+        const el = document.getElementById('blueprint-info');
+        if (el) {
+            el.textContent = text || '';
+        }
+    }
 </script>
 
 <!-- Add some CSS for the toolbar -->
@@ -122,6 +214,13 @@
 
     .toolbar-button i {
         font-size: 14px;
+    }
+
+    .blueprint-info {
+        margin-left: auto;
+        color: #90a4ae;
+        font-size: 14px;
+        padding: 8px 0;
     }
 </style>
 {% endblock %}

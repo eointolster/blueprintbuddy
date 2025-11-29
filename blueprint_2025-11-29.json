@@ -1,0 +1,683 @@
+{
+  "components": [
+    {
+      "height": 100,
+      "id": "gen-Computer-Input-WASD-",
+      "inputs": [
+        {
+          "id": "in",
+          "name": "input",
+          "type": "any"
+        }
+      ],
+      "metadata": {
+        "generated_from": "generate blueprint of laser controlled by an arduino board communicating with a computer with aswd keys"
+      },
+      "name": "Computer Input (WASD)",
+      "outputs": [
+        {
+          "id": "out",
+          "name": "output",
+          "type": "any"
+        }
+      ],
+      "type": "module",
+      "width": 216.16668701171875,
+      "x": -1209.5913140873608,
+      "y": -123.61590699642193
+    },
+    {
+      "height": 100,
+      "id": "gen-Serial-Link",
+      "inputs": [
+        {
+          "id": "in",
+          "name": "input",
+          "type": "any"
+        }
+      ],
+      "metadata": {
+        "generated_from": "generate blueprint of laser controlled by an arduino board communicating with a computer with aswd keys"
+      },
+      "name": "Serial Link",
+      "outputs": [
+        {
+          "id": "out",
+          "name": "output",
+          "type": "any"
+        }
+      ],
+      "type": "module",
+      "width": 150,
+      "x": -364.21485662823557,
+      "y": -170.3657817760519
+    },
+    {
+      "height": 100,
+      "id": "gen-Arduino-MCU",
+      "inputs": [
+        {
+          "id": "in",
+          "name": "input",
+          "type": "any"
+        }
+      ],
+      "metadata": {
+        "generated_from": "generate blueprint of laser controlled by an arduino board communicating with a computer with aswd keys"
+      },
+      "name": "Arduino / MCU",
+      "outputs": [
+        {
+          "id": "out",
+          "name": "output",
+          "type": "any"
+        }
+      ],
+      "type": "module",
+      "width": 150,
+      "x": -1142.1850459886848,
+      "y": 597.8904937692009
+    },
+    {
+      "height": 100,
+      "id": "gen-Motor-Driver",
+      "inputs": [
+        {
+          "id": "in",
+          "name": "input",
+          "type": "any"
+        }
+      ],
+      "metadata": {
+        "generated_from": "generate blueprint of laser controlled by an arduino board communicating with a computer with aswd keys"
+      },
+      "name": "Motor Driver",
+      "outputs": [
+        {
+          "id": "out",
+          "name": "output",
+          "type": "any"
+        }
+      ],
+      "type": "module",
+      "width": 150,
+      "x": -650.5490936914832,
+      "y": -455.54001793179486
+    },
+    {
+      "height": 100,
+      "id": "gen-Stepper-Motors",
+      "inputs": [
+        {
+          "id": "in",
+          "name": "input",
+          "type": "any"
+        }
+      ],
+      "metadata": {
+        "generated_from": "generate blueprint of laser controlled by an arduino board communicating with a computer with aswd keys"
+      },
+      "name": "Stepper Motors",
+      "outputs": [
+        {
+          "id": "out",
+          "name": "output",
+          "type": "any"
+        }
+      ],
+      "type": "module",
+      "width": 157.45834350585938,
+      "x": 742.0000152587891,
+      "y": 160
+    },
+    {
+      "height": 100,
+      "id": "gen-Laser-Module",
+      "inputs": [
+        {
+          "id": "in",
+          "name": "input",
+          "type": "any"
+        }
+      ],
+      "metadata": {
+        "generated_from": "generate blueprint of laser controlled by an arduino board communicating with a computer with aswd keys"
+      },
+      "name": "Laser Module",
+      "outputs": [
+        {
+          "id": "out",
+          "name": "output",
+          "type": "any"
+        }
+      ],
+      "type": "module",
+      "width": 150,
+      "x": -1021.2325072661324,
+      "y": 16.63371734246803
+    },
+    {
+      "height": 100,
+      "id": "gen-Sensors-Limits",
+      "inputs": [
+        {
+          "id": "in",
+          "name": "input",
+          "type": "any"
+        }
+      ],
+      "metadata": {
+        "generated_from": "generate blueprint of laser controlled by an arduino board communicating with a computer with aswd keys"
+      },
+      "name": "Sensors / Limits",
+      "outputs": [
+        {
+          "id": "out",
+          "name": "output",
+          "type": "any"
+        }
+      ],
+      "type": "module",
+      "width": 174.2291717529297,
+      "x": -99.09968786132566,
+      "y": -78.42436137611296
+    },
+    {
+      "height": 100,
+      "id": "gen-Control-Loop",
+      "inputs": [
+        {
+          "id": "in",
+          "name": "input",
+          "type": "any"
+        }
+      ],
+      "metadata": {
+        "generated_from": "generate blueprint of laser controlled by an arduino board communicating with a computer with aswd keys"
+      },
+      "name": "Control Loop",
+      "outputs": [
+        {
+          "id": "out",
+          "name": "output",
+          "type": "any"
+        }
+      ],
+      "type": "function",
+      "width": 150,
+      "x": 475.72475047151073,
+      "y": 353.508404291543
+    },
+    {
+      "height": 100,
+      "id": "gen-Telemetry",
+      "inputs": [
+        {
+          "id": "in",
+          "name": "input",
+          "type": "any"
+        }
+      ],
+      "metadata": {
+        "generated_from": "generate blueprint of laser controlled by an arduino board communicating with a computer with aswd keys"
+      },
+      "name": "Telemetry",
+      "outputs": [
+        {
+          "id": "out",
+          "name": "output",
+          "type": "any"
+        }
+      ],
+      "type": "function",
+      "width": 150,
+      "x": 266.70962166588413,
+      "y": 557.925112698333
+    },
+    {
+      "height": 100,
+      "id": "gen-Web-Interface",
+      "inputs": [
+        {
+          "id": "in",
+          "name": "input",
+          "type": "any"
+        }
+      ],
+      "metadata": {
+        "generated_from": "generate blueprint of laser controlled by an arduino board communicating with a computer with aswd keys"
+      },
+      "name": "Web Interface",
+      "outputs": [
+        {
+          "id": "out",
+          "name": "output",
+          "type": "any"
+        }
+      ],
+      "type": "module",
+      "width": 150,
+      "x": 1103.3333587646484,
+      "y": 160
+    },
+    {
+      "height": 100,
+      "id": "gen-API",
+      "inputs": [
+        {
+          "id": "in",
+          "name": "input",
+          "type": "any"
+        }
+      ],
+      "metadata": {
+        "generated_from": "generate blueprint of laser controlled by an arduino board communicating with a computer with aswd keys"
+      },
+      "name": "API",
+      "outputs": [
+        {
+          "id": "out",
+          "name": "output",
+          "type": "any"
+        }
+      ],
+      "type": "module",
+      "width": 150,
+      "x": -753.5980298890092,
+      "y": 199.23381751876403
+    },
+    {
+      "height": 100,
+      "id": "gen-Client",
+      "inputs": [
+        {
+          "id": "in",
+          "name": "input",
+          "type": "any"
+        }
+      ],
+      "metadata": {
+        "generated_from": "add a stripe payment system and generate blueprint"
+      },
+      "name": "Client",
+      "outputs": [
+        {
+          "id": "out",
+          "name": "output",
+          "type": "any"
+        }
+      ],
+      "type": "module",
+      "width": 150,
+      "x": -1426.0000457763672,
+      "y": 160
+    },
+    {
+      "height": 100,
+      "id": "gen-Service-A",
+      "inputs": [
+        {
+          "id": "in",
+          "name": "input",
+          "type": "any"
+        }
+      ],
+      "metadata": {
+        "generated_from": "add a stripe payment system and generate blueprint"
+      },
+      "name": "Service A",
+      "outputs": [
+        {
+          "id": "out",
+          "name": "output",
+          "type": "any"
+        }
+      ],
+      "type": "function",
+      "width": 150,
+      "x": -346.874214419092,
+      "y": 715.316357789754
+    },
+    {
+      "height": 100,
+      "id": "gen-Service-B",
+      "inputs": [
+        {
+          "id": "in",
+          "name": "input",
+          "type": "any"
+        }
+      ],
+      "metadata": {
+        "generated_from": "add a stripe payment system and generate blueprint"
+      },
+      "name": "Service B",
+      "outputs": [
+        {
+          "id": "out",
+          "name": "output",
+          "type": "any"
+        }
+      ],
+      "type": "function",
+      "width": 150,
+      "x": 343.2667719292257,
+      "y": 748.0412701354949
+    },
+    {
+      "height": 100,
+      "id": "gen-Database",
+      "inputs": [
+        {
+          "id": "in",
+          "name": "input",
+          "type": "any"
+        }
+      ],
+      "metadata": {
+        "generated_from": "add a stripe payment system and generate blueprint"
+      },
+      "name": "Database",
+      "outputs": [
+        {
+          "id": "out",
+          "name": "output",
+          "type": "any"
+        }
+      ],
+      "type": "module",
+      "width": 150,
+      "x": 200,
+      "y": 1040
+    },
+    {
+      "height": 100,
+      "id": "gen-Payment-Gateway",
+      "inputs": [
+        {
+          "id": "in",
+          "name": "input",
+          "type": "any"
+        }
+      ],
+      "metadata": {
+        "generated_from": "add a stripe payment system and generate blueprint"
+      },
+      "name": "Payment Gateway",
+      "outputs": [
+        {
+          "id": "out",
+          "name": "output",
+          "type": "any"
+        }
+      ],
+      "type": "module",
+      "width": 165.83334350585938,
+      "x": -479.13298127903704,
+      "y": 925.6907942980889
+    },
+    {
+      "height": 100,
+      "id": "gen-Billing-Service",
+      "inputs": [
+        {
+          "id": "in",
+          "name": "input",
+          "type": "any"
+        }
+      ],
+      "metadata": {
+        "generated_from": "add a stripe payment system and generate blueprint"
+      },
+      "name": "Billing Service",
+      "outputs": [
+        {
+          "id": "out",
+          "name": "output",
+          "type": "any"
+        }
+      ],
+      "type": "function",
+      "width": 165.83334350585938,
+      "x": 259.21650805419796,
+      "y": 1324.8986476200039
+    },
+    {
+      "height": 100,
+      "id": "sonar_sensor",
+      "inputs": [
+        {
+          "id": "in",
+          "name": "input",
+          "type": "any"
+        }
+      ],
+      "metadata": {
+        "generated_from": "add an arduinio sonar sensor and generate blueprint",
+        "source": "ai_model"
+      },
+      "name": "Arduino Sonar Sensor",
+      "outputs": [
+        {
+          "id": "out",
+          "name": "output",
+          "type": "any"
+        }
+      ],
+      "type": "module",
+      "width": 207.79168701171875,
+      "x": 2187.3333892822266,
+      "y": 160
+    },
+    {
+      "height": 100,
+      "id": "sonar_trigger",
+      "inputs": [
+        {
+          "id": "in",
+          "name": "input",
+          "type": "any"
+        }
+      ],
+      "metadata": {
+        "generated_from": "add an arduinio sonar sensor and generate blueprint",
+        "source": "ai_model"
+      },
+      "name": "Trigger Signal Generator",
+      "outputs": [
+        {
+          "id": "out",
+          "name": "output",
+          "type": "any"
+        }
+      ],
+      "type": "function",
+      "width": 241.33334350585938,
+      "x": 1696.2603021880445,
+      "y": -276.3321646098799
+    },
+    {
+      "height": 100,
+      "id": "sonar_echo",
+      "inputs": [
+        {
+          "id": "in",
+          "name": "input",
+          "type": "any"
+        }
+      ],
+      "metadata": {
+        "generated_from": "add an arduinio sonar sensor and generate blueprint",
+        "source": "ai_model"
+      },
+      "name": "Echo Pulse Reader",
+      "outputs": [
+        {
+          "id": "out",
+          "name": "output",
+          "type": "any"
+        }
+      ],
+      "type": "function",
+      "width": 182.62501525878906,
+      "x": 1826.0000457763672,
+      "y": 160
+    },
+    {
+      "height": 100,
+      "id": "distance_calc",
+      "inputs": [
+        {
+          "id": "in",
+          "name": "input",
+          "type": "any"
+        }
+      ],
+      "metadata": {
+        "generated_from": "add an arduinio sonar sensor and generate blueprint",
+        "source": "ai_model"
+      },
+      "name": "Distance Calculator",
+      "outputs": [
+        {
+          "id": "out",
+          "name": "output",
+          "type": "any"
+        }
+      ],
+      "type": "function",
+      "width": 199.39584350585938,
+      "x": 366.47662546887113,
+      "y": -226.4656315116079
+    },
+    {
+      "height": 100,
+      "id": "sensor_controller",
+      "inputs": [
+        {
+          "id": "in",
+          "name": "input",
+          "type": "any"
+        }
+      ],
+      "metadata": {
+        "generated_from": "add an arduinio sonar sensor and generate blueprint",
+        "source": "ai_model"
+      },
+      "name": "Sonar Controller",
+      "outputs": [
+        {
+          "id": "out",
+          "name": "output",
+          "type": "any"
+        }
+      ],
+      "type": "class",
+      "width": 174.2291717529297,
+      "x": 919.2516867338854,
+      "y": -513.1981968266718
+    }
+  ],
+  "connections": [
+    {
+      "from": "gen-Computer-Input-WASD--out",
+      "to": "gen-Serial-Link-in"
+    },
+    {
+      "from": "gen-Serial-Link-out",
+      "to": "gen-Arduino-MCU-in"
+    },
+    {
+      "from": "gen-Arduino-MCU-out",
+      "to": "gen-Control-Loop-in"
+    },
+    {
+      "from": "gen-Control-Loop-out",
+      "to": "gen-Motor-Driver-in"
+    },
+    {
+      "from": "gen-Motor-Driver-out",
+      "to": "gen-Stepper-Motors-in"
+    },
+    {
+      "from": "gen-Control-Loop-out",
+      "to": "gen-Laser-Module-in"
+    },
+    {
+      "from": "gen-Sensors-Limits-out",
+      "to": "gen-Control-Loop-in"
+    },
+    {
+      "from": "gen-Control-Loop-out",
+      "to": "gen-Telemetry-in"
+    },
+    {
+      "from": "gen-Telemetry-out",
+      "to": "gen-Computer-Input-WASD--in"
+    },
+    {
+      "from": "gen-Web-Interface-out",
+      "to": "gen-API-in"
+    },
+    {
+      "from": "gen-API-out",
+      "to": "gen-Telemetry-in"
+    },
+    {
+      "from": "gen-Client-out",
+      "to": "gen-API-in"
+    },
+    {
+      "from": "gen-API-out",
+      "to": "gen-Service-A-in"
+    },
+    {
+      "from": "gen-API-out",
+      "to": "gen-Service-B-in"
+    },
+    {
+      "from": "gen-Service-A-out",
+      "to": "gen-Database-in"
+    },
+    {
+      "from": "gen-Service-B-out",
+      "to": "gen-Database-in"
+    },
+    {
+      "from": "gen-API-out",
+      "to": "gen-Payment-Gateway-in"
+    },
+    {
+      "from": "gen-Payment-Gateway-out",
+      "to": "gen-Billing-Service-in"
+    },
+    {
+      "from": "gen-Billing-Service-out",
+      "to": "gen-Database-in"
+    },
+    {
+      "from": "sensor_controller-out",
+      "to": "sonar_trigger-in"
+    },
+    {
+      "from": "sonar_trigger-out",
+      "to": "sonar_sensor-in"
+    },
+    {
+      "from": "sonar_sensor-out",
+      "to": "sonar_echo-in"
+    },
+    {
+      "from": "sonar_echo-out",
+      "to": "distance_calc-in"
+    },
+    {
+      "from": "distance_calc-out",
+      "to": "sensor_controller-in"
+    }
+  ],
+  "metadata": {
+    "version": "1.0",
+    "timestamp": "2025-11-29T13:10:59.059Z"
+  }
+}

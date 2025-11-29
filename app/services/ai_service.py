@@ -9,7 +9,7 @@ import json
 from typing import Dict, List, Optional, Any
 
 # Anthropic model configuration
-ANTHROPIC_MODEL = "claude-3-5-sonnet-20241022"
+ANTHROPIC_MODEL = "claude-haiku-4-5-20251001"
 
 
 class AIService:
@@ -287,6 +287,69 @@ class AIService:
             """
 
         return base_prompt
+
+    def generate_blueprint(self, prompt: str, base_blueprint: Optional[Dict] = None) -> Dict[str, Any]:
+        """
+        Generate a blueprint JSON from a natural-language prompt.
+
+        Args:
+            prompt: user request
+            base_blueprint: optional existing blueprint to extend
+
+        Returns:
+            Dict with components and connections or error
+        """
+        if not self.client:
+            return {'error': 'AI service not configured'}
+
+        try:
+            base_components = base_blueprint.get('components', []) if base_blueprint else []
+            base_connections = base_blueprint.get('connections', []) if base_blueprint else []
+
+            sys_prompt = (
+                "You generate software/system architecture blueprints as JSON only. "
+                "Return a compact JSON object with 'components' (array) and 'connections' (array). "
+                "Each component: {id,name,type}. Types are function|module|class. "
+                "Each connection: {from,to} referencing component ids plus '-out'/'-in' ports. "
+                "Do not include markdown or code fences—just JSON."
+            )
+
+            base_summary = ""
+            if base_components or base_connections:
+                base_summary = f"Existing components: {len(base_components)}, connections: {len(base_connections)}."
+
+            response = self.client.messages.create(
+                model=ANTHROPIC_MODEL,
+                max_tokens=600,
+                system=sys_prompt,
+                messages=[
+                    {"role": "user", "content": f"{prompt}\n{base_summary}"}
+                ]
+            )
+
+            text = response.content[0].text.strip()
+            # Extract JSON object
+            start = text.find('{')
+            end = text.rfind('}')
+            if start == -1 or end == -1:
+                return {'error': 'AI response missing JSON'}
+            import json
+            parsed = json.loads(text[start:end + 1])
+
+            if 'components' not in parsed:
+                parsed['components'] = []
+            if 'connections' not in parsed:
+                parsed['connections'] = []
+
+            return {
+                'components': parsed['components'],
+                'connections': parsed['connections'],
+                'metadata': {'source': 'ai_model'}
+            }
+
+        except Exception as e:
+            current_app.logger.error(f"Error generating blueprint: {e}")
+            return {'error': str(e)}
 
 
 # Global instance

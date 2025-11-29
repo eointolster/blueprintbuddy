@@ -32,18 +32,18 @@ class ConnectionManager {
     /**
      * Update temporary connection as mouse moves
      */
-    updateTempConnection(event, mainGroup) {
+    updateTempConnection(event, mainGroup, canvasPoint) {
         if (!this.isCreatingConnection || !this.startPort) return;
 
         const startPortElement = this.startPort.select('circle');
-        const startComponentId = this.startPort.attr('id').split('-')[0];
+        const { componentId: startComponentId } = this.parsePortId(this.startPort.attr('id'));
         const startComponent = d3.select(`#${startComponentId}`);
 
         const [compX, compY] = this.parseTransform(startComponent.attr('transform'));
         const startX = compX + parseFloat(startPortElement.attr('cx'));
         const startY = compY + parseFloat(startPortElement.attr('cy'));
 
-        const [mouseX, mouseY] = d3.pointer(event, mainGroup.node());
+        const [mouseX, mouseY] = canvasPoint || d3.pointer(event, mainGroup.node());
 
         const points = [
             [startX, startY],
@@ -247,8 +247,8 @@ class ConnectionManager {
      */
     validateConnection(fromPort, toPort, components) {
         // Find the components
-        const fromComponentId = fromPort.split('-')[0];
-        const toComponentId = toPort.split('-')[0];
+        const { componentId: fromComponentId, portId: fromPortIdRaw } = this.parsePortId(fromPort);
+        const { componentId: toComponentId, portId: toPortIdRaw } = this.parsePortId(toPort);
 
         const fromComponent = components.find(c => c.id === fromComponentId);
         const toComponent = components.find(c => c.id === toComponentId);
@@ -258,11 +258,8 @@ class ConnectionManager {
         }
 
         // Find the ports
-        const fromPortId = fromPort.replace(`${fromComponentId}-`, '');
-        const toPortId = toPort.replace(`${toComponentId}-`, '');
-
-        const fromPortData = fromComponent.outputs?.find(p => p.id === fromPortId);
-        const toPortData = toComponent.inputs?.find(p => p.id === toPortId);
+        const fromPortData = fromComponent.outputs?.find(p => p.id === fromPortIdRaw);
+        const toPortData = toComponent.inputs?.find(p => p.id === toPortIdRaw);
 
         if (!fromPortData) {
             return { valid: false, error: 'From port not found or not an output' };
@@ -304,6 +301,25 @@ class ConnectionManager {
         return connections.filter(conn =>
             conn.from === portId || conn.to === portId
         );
+    }
+
+    /**
+     * Parse a port id of the form "<component-id>-<port-id>"
+     * Handles component ids that already contain hyphens.
+     */
+    parsePortId(portId) {
+        if (typeof portId !== 'string') {
+            return { componentId: '', portId: '' };
+        }
+
+        const parts = portId.split('-');
+        if (parts.length < 2) {
+            return { componentId: portId, portId: '' };
+        }
+
+        const portIdPart = parts.pop();
+        const componentId = parts.join('-');
+        return { componentId, portId: portIdPart };
     }
 
     /**

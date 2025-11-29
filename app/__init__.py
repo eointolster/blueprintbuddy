@@ -47,6 +47,7 @@ def create_app(config_class=Config):
     with app.app_context():
         from app.services.file_service import get_file_service
         from app.services.ai_service import get_ai_service
+        from app.services.code_map_service import get_code_map_service
 
         # Create database tables
         db.create_all()
@@ -56,6 +57,9 @@ def create_app(config_class=Config):
 
         ai_service = get_ai_service()
         # AI service initializes in its constructor
+
+        code_map_service = get_code_map_service()
+        code_map_service.initialize()
 
     # Register blueprints
     from app.routes import main, api, auth

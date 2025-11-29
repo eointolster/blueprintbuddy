@@ -7,6 +7,7 @@ from flask import Blueprint, request, jsonify, current_app
 from app.services.ai_service import get_ai_service
 from app.services.file_service import get_file_service
 from app.services.component_service import get_component_service
+from app.services.code_map_service import get_code_map_service
 from functools import wraps
 import traceback
 
@@ -309,6 +310,57 @@ def export_svg():
         return jsonify(result), 201
     else:
         return jsonify(result), 500
+
+
+# ============================================================================
+# Code Mapping (visualize codebase)
+# ============================================================================
+
+@bp.route('/code/map', methods=['POST'])
+@handle_errors
+def map_codebase():
+    """Generate a blueprint from a Python codebase"""
+    data = request.get_json() or {}
+    root_subpath = data.get('path', '.')
+    max_files = data.get('max_files')
+
+    code_map_service = get_code_map_service()
+    result = code_map_service.map_codebase(root_subpath, max_files=max_files)
+
+    status = 200 if result.get('success') else 400
+    return jsonify(result), status
+
+
+@bp.route('/code/map-file', methods=['POST'])
+@handle_errors
+def map_code_file():
+    """Generate a blueprint from a single Python file"""
+    data = request.get_json() or {}
+    file_path = data.get('path')
+    if not file_path:
+        return jsonify({"success": False, "error": "No file path provided"}), 400
+
+    code_map_service = get_code_map_service()
+    result = code_map_service.map_file(file_path)
+
+    status = 200 if result.get('success') else 400
+    return jsonify(result), status
+
+
+@bp.route('/blueprints/generate', methods=['POST'])
+@handle_errors
+def generate_blueprint_from_prompt():
+    """Generate a blueprint from a natural-language prompt"""
+    data = request.get_json() or {}
+    prompt = data.get('prompt')
+    base_blueprint = data.get('blueprint')
+    if not prompt:
+        return jsonify({"success": False, "error": "Prompt is required"}), 400
+
+    code_map_service = get_code_map_service()
+    result = code_map_service.generate_from_prompt(prompt, base_blueprint=base_blueprint)
+    status = 200 if result.get('success') else 400
+    return jsonify(result), status
 
 
 # ============================================================================
